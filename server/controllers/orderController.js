@@ -4,7 +4,7 @@ const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find({})
             .populate("products", "name price")
-            .populate("user", "firstName lastName email")
+            .populate("user", "firstName lastName email -_id")
         if (!orders) {
             return res.status(400).json({
                 error: "No Orders exist"
@@ -64,8 +64,8 @@ const getOrderByUser = async (req, res) => {
 
 }
 const createOrder = async (req, res) => {
-    const {products, user, amount, address} = req.body;
-    if(!products || !user || !amount || !address) {
+    const {products, user, address} = req.body;
+    if(!products || !user || !address) {
         return res.status(400).json({
             message: "Please provide complete details"
         })
@@ -74,8 +74,8 @@ const createOrder = async (req, res) => {
         const newOrder = new Order({
             products,
             user,
-            amount,
-            address
+            address,
+            total: products.length
         })
         const savedOrder = await newOrder.save();
         if(!savedOrder) {
@@ -89,6 +89,9 @@ const createOrder = async (req, res) => {
         })
     } catch(err) {
         console.log(err)
+        return res.status(400).json({
+            message: "something went wrong"
+        })
     }
 }
 const updateOrder = async (req, res) => {
