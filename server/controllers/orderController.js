@@ -17,7 +17,7 @@ const getAllOrders = async (req, res) => {
     } catch (err) {
         console.log(err)
     }
-} // this will also work as order history for a particular user
+}
 
 
 const getSingleOrder = async (req, res) => {
@@ -64,16 +64,17 @@ const getOrderByUser = async (req, res) => {
 
 }
 const createOrder = async (req, res) => {
-    const {products, user, address} = req.body;
-    if(!products || !user || !address) {
+    const {products, address} = req.body;
+    if(!products || !address) {
         return res.status(400).json({
             message: "Please provide complete details"
         })
     }
+
     try{
         const newOrder = new Order({
             products,
-            user,
+            user : req.loggedInUserId,
             address,
             total: products.length
         })
