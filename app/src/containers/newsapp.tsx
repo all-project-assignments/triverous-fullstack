@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Card from "../components/card";
 import Navbar from "../components/navbar";
+import { useNavigate } from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../config/firebase";
 
 type Props = {};
 export type OptionalString = string | null;
@@ -21,16 +24,25 @@ type ArticleType = {
 };
 
 const Newsapp = (props: Props) => {
+  const navigate = useNavigate()
+
+  const [user, loading, error] = useAuthState(auth);
+  console.log("user", user)
   const { data, isLoading, isError } = useQuery({
     queryKey: ["top-healines"],
     queryFn: async () => {
       const res = await axios.get(`https://newsapi.org/v2/top-headlines?country=in&apiKey=${process.env.REACT_APP_API_KEY}`)
-      // const res = await axios.get(
-      //   `https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=7e58f1b053844f898508985173fb61ce`
-      // );
       return res.data;
     },
   });
+
+  useEffect(() => {
+    if (loading) {
+      // maybe trigger a loading screen
+      return;
+    }
+    if (!user) navigate("/");
+  }, [user, loading]);
 
   console.log("key", process.env.NODE_ENV);
   // console.log("key", process.env.REACT_APP_API_KEY)
@@ -42,7 +54,7 @@ const Newsapp = (props: Props) => {
   return <React.Fragment>
     <Navbar />
     {
-      isLoading ? (
+      isLoading || loading ? (
         <div>isLoading...</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-4 mt-4 mx-4">

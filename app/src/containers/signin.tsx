@@ -16,6 +16,7 @@ type Inputs = {
 
 const Signin = (props: Props) => {
   const [user, loading, error] = useAuthState(auth);
+  console.log("user", user)
   const navigate = useNavigate();
   const {
     register,
@@ -30,7 +31,7 @@ const Signin = (props: Props) => {
       return;
     }
     if (user) navigate("/home");
-  }, [user]);
+  }, [user, loading]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     logInWithEmailAndPassword(data.email, data.password)
